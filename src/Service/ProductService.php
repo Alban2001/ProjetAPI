@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Product;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,6 +15,7 @@ class ProductService implements ProductServiceInterface
     {
     }
 
+    // Récupération de tous les produits
     public function findAll(): JsonResponse
     {
         $productList = $this->productRepository->findAll();
@@ -23,5 +25,13 @@ class ProductService implements ProductServiceInterface
             json_decode($jsonProductList),
             Response::HTTP_OK,
         ]);
+    }
+
+    // Récupération des détails d'un produit
+    public function find(Product $product): JsonResponse
+    {
+        $jsonBook = $this->serializer->serialize($product, 'json');
+
+        return new JsonResponse($jsonBook, Response::HTTP_OK, ['accept' => 'json'], true);
     }
 }

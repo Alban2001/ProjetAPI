@@ -2,13 +2,12 @@
 
 namespace App\Controller;
 
-use App\Repository\ProductRepository;
+use App\Entity\Product;
 use App\Service\ProductServiceInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Serializer\SerializerInterface;
 
 class ProductController extends AbstractController
 {
@@ -17,9 +16,16 @@ class ProductController extends AbstractController
     }
 
     // Affichage de tout les produits
-    #[Route('/api/products', name: 'products_index', methods: ['GET'])]
-    public function index(ProductRepository $productRepository, SerializerInterface $serializer): JsonResponse
+    #[Route('/api/products', name: 'products_list', methods: ['GET'])]
+    public function getProductList(): JsonResponse
     {
         return $this->productService->findAll();
+    }
+
+    // Affichage d'un produit en détail
+    #[Route('/api/products/{id}', name: 'product_details', methods: ['GET'])]
+    public function getProductDetails(#[MapEntity(expr: 'repository.find(id)')] Product $product): JsonResponse
+    {
+        return $this->productService->find($product);
     }
 }
