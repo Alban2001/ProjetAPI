@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Client;
 use App\Entity\Product;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -11,11 +12,11 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
+        // Création automatique de 20 produits (portable)
         $typeOS = ["IOS", "Android"];
         $memoryRam = [4, 6, 8, 10, 12, 14, 16, 18, 20];
         $memoryStore = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
         $model = ["Apple", "Samsung", "Google", "Nokia", "Xiaomi"];
-        // Création automatique de 20 produits (portable)
 
         for ($i = 0; $i < 20; $i++) {
             $product = new Product();
@@ -31,6 +32,13 @@ class AppFixtures extends Fixture
             $product->setTypeOS($typeOS[$rndTypeOS - 1]);
             $manager->persist($product);
         }
+
+        // Création d'un client
+        $client = new Client();
+        $client->setName("Client 01");
+        $client->setEmail("client01@gmail.com");
+        $client->setPassword('$2y$10$mgou2DC8SJwlaxmYlJJOheSJVyWpj7wwgaCue7xOLR9fP/oCOQFj6'); // Client01?!
+        $manager->persist($client);
 
         $manager->flush();
     }
