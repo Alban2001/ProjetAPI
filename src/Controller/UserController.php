@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Service\UserServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,9 +15,17 @@ class UserController extends AbstractController
     {
     }
 
+    // Création d'un nouvel utilisateur
     #[Route('/api/users/create', name: 'createUser', methods: ['POST'])]
     public function createUser(Request $request): JsonResponse
     {
-        return $this->userService->createUser($request);
+        return $this->userService->create($request);
+    }
+
+    // Suppression d'un utilisateur
+    #[Route('/api/users/delete/{id}', name: 'deleteUser', methods: ['DELETE'])]
+    public function deleteUser(User $user): JsonResponse
+    {
+        return $this->userService->delete($user);
     }
 }
