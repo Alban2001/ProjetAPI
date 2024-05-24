@@ -20,8 +20,8 @@ class UserService implements UserServiceInterface
     {
     }
 
-    // Récupération de tous les produits
-    public function createUser(Request $request): JsonResponse
+    // Création d'un utilisateur
+    public function create(Request $request): JsonResponse
     {
         // Récupération des données
         $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
@@ -40,5 +40,15 @@ class UserService implements UserServiceInterface
         // return new JsonResponse($jsonUser, Response::HTTP_CREATED, ["Location" => $location], true);
 
         return new JsonResponse($jsonUser, Response::HTTP_CREATED, [], true);
+    }
+
+
+    // Suppression d'un utilisateur
+    public function delete(User $user): JsonResponse
+    {
+        $this->em->remove($user);
+        $this->em->flush();
+
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 }
