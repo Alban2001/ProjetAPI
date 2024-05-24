@@ -2,10 +2,9 @@
 
 namespace App\Service;
 
-use App\Entity\Product;
+use App\Entity\Client;
 use App\Entity\User;
 use App\Repository\ClientRepository;
-use App\Repository\ProductRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,6 +17,20 @@ class UserService implements UserServiceInterface
 {
     public function __construct(private readonly UserRepository $userRepository, private readonly SerializerInterface $serializer, private readonly ClientRepository $clientRepository, private readonly EntityManagerInterface $em, private readonly UrlGeneratorInterface $urlGenerator)
     {
+    }
+
+    // Récupération de tout les users par un client
+    public function findAll(Client $client): JsonResponse
+    {
+        $userList = $this->userRepository->findBy(
+            ['client' => $client]
+        );
+        $userListJson = $this->serializer->serialize($userList, 'json', ['groups' => 'getUsers']);
+
+        return new JsonResponse([
+            json_decode($userListJson),
+            Response::HTTP_OK,
+        ]);
     }
 
     // Création d'un utilisateur
