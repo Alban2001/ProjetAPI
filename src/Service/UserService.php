@@ -33,6 +33,14 @@ class UserService implements UserServiceInterface
         ]);
     }
 
+    // Récupération des détails d'un utilisateur d'un client
+    public function find(User $user): JsonResponse
+    {
+        $userJson = $this->serializer->serialize($user, 'json', ['groups' => 'getUsers']);
+
+        return new JsonResponse($userJson, Response::HTTP_OK, ['accept' => 'json'], true);
+    }
+
     // Création d'un utilisateur
     public function create(Request $request): JsonResponse
     {
@@ -49,10 +57,9 @@ class UserService implements UserServiceInterface
 
         $jsonUser = $this->serializer->serialize($user, 'json', ['groups' => 'getUsers']);
 
-        // $location = $this->urlGenerator->generate('user_details', ['id' => $user->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
-        // return new JsonResponse($jsonUser, Response::HTTP_CREATED, ["Location" => $location], true);
+        $location = $this->urlGenerator->generate('user_details', ['id' => $user->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        return new JsonResponse($jsonUser, Response::HTTP_CREATED, [], true);
+        return new JsonResponse($jsonUser, Response::HTTP_CREATED, ["Location" => $location], true);
     }
 
 

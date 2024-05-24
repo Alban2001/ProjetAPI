@@ -18,10 +18,17 @@ class UserController extends AbstractController
     }
 
     // Affichage de touts les utilisateurs d'un client
-    #[Route('/api/users/{idClient}', name: 'users_list', methods: ['GET'])]
+    #[Route('/api/users/client/{idClient}', name: 'users_list', methods: ['GET'])]
     public function getUserList(#[MapEntity(expr: 'repository.find(idClient)')] Client $client): JsonResponse
     {
         return $this->userService->findAll($client);
+    }
+
+    // Affichage des détails d'un utilisateur d'un client
+    #[Route('/api/users/{id}', name: 'user_details', methods: ['GET'])]
+    public function getUserDetails(#[MapEntity(expr: 'repository.find(id)')] User $user): JsonResponse
+    {
+        return $this->userService->find($user);
     }
 
     // Création d'un nouvel utilisateur
