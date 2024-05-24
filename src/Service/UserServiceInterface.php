@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 interface UserServiceInterface
 {
     public function findAll(Client $client);
+    public function find(User $user);
     public function create(Request $request);
     public function delete(User $user);
 }
