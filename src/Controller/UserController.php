@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Client;
 use App\Entity\User;
 use App\Service\UserServiceInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,6 +15,13 @@ class UserController extends AbstractController
 {
     public function __construct(private readonly UserServiceInterface $userService)
     {
+    }
+
+    // Affichage de touts les utilisateurs d'un client
+    #[Route('/api/users/{idClient}', name: 'users_list', methods: ['GET'])]
+    public function getUserList(#[MapEntity(expr: 'repository.find(idClient)')] Client $client): JsonResponse
+    {
+        return $this->userService->findAll($client);
     }
 
     // Création d'un nouvel utilisateur
