@@ -9,8 +9,10 @@ use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[Route('/api')]
 class UserController extends AbstractController
 {
     public function __construct(private readonly UserServiceInterface $userService)
@@ -18,30 +20,36 @@ class UserController extends AbstractController
     }
 
     // Affichage de touts les utilisateurs d'un client
-    #[Route('/api/users/client/{idClient}', name: 'users_list', methods: ['GET'])]
-    public function getUserList(#[MapEntity(expr: 'repository.find(idClient)')] Client $client): JsonResponse
+    #[Route('/users/client/{id}', name: 'users_list', methods: ['GET'])]
+    public function getUserList(#[MapEntity(expr: 'repository.find(id)')] Client $client): JsonResponse
     {
-        return $this->userService->findAll($client);
+        return new JsonResponse([
+            json_decode($this->userService->findAll($client))
+        ], Response::HTTP_OK);
     }
 
     // Affichage des détails d'un utilisateur d'un client
-    #[Route('/api/users/{id}', name: 'user_details', methods: ['GET'])]
+    #[Route('/users/{id}', name: 'user_details', methods: ['GET'])]
     public function getUserDetails(#[MapEntity(expr: 'repository.find(id)')] User $user): JsonResponse
     {
-        return $this->userService->find($user);
+        return new JsonResponse($this->userService->find($user), Response::HTTP_OK, ['accept' => 'json'], true);
     }
 
     // Création d'un nouvel utilisateur
-    #[Route('/api/users/create', name: 'createUser', methods: ['POST'])]
+    #[Route('/users/', name: 'createUser', methods: ['POST'])]
     public function createUser(Request $request): JsonResponse
     {
-        return $this->userService->create($request);
+        $arr = $this->userService->create($request);
+
+        return new JsonResponse($arr["jsonUser"], Response::HTTP_CREATED, ["Location" => $arr["location"]], true);
     }
 
     // Suppression d'un utilisateur
-    #[Route('/api/users/delete/{id}', name: 'deleteUser', methods: ['DELETE'])]
+    #[Route('/users/{id}', name: 'deleteUser', methods: ['DELETE'])]
     public function deleteUser(User $user): JsonResponse
     {
-        return $this->userService->delete($user);
+        $this->userService->delete($user);
+
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 }
