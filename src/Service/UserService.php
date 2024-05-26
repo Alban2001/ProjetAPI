@@ -15,34 +15,31 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class UserService implements UserServiceInterface
 {
-    public function __construct(private readonly UserRepository $userRepository, private readonly SerializerInterface $serializer, private readonly ClientRepository $clientRepository, private readonly EntityManagerInterface $em, private readonly UrlGeneratorInterface $urlGenerator)
-    {
+    public function __construct(
+        private readonly UserRepository $userRepository,
+        private readonly SerializerInterface $serializer,
+        private readonly ClientRepository $clientRepository,
+        private readonly EntityManagerInterface $em,
+        private readonly UrlGeneratorInterface $urlGenerator
+    ) {
     }
 
     // Récupération de tout les users par un client
-    public function findAll(Client $client): JsonResponse
+    public function findAll(Client $client): string
     {
-        $userList = $this->userRepository->findBy(
-            ['client' => $client]
-        );
-        $userListJson = $this->serializer->serialize($userList, 'json', ['groups' => 'getUsers']);
+        $userList = $this->userRepository->findByClient($client);
 
-        return new JsonResponse([
-            json_decode($userListJson),
-            Response::HTTP_OK,
-        ]);
+        return $this->serializer->serialize($userList, 'json', ['groups' => 'getUsers']);
     }
 
     // Récupération des détails d'un utilisateur d'un client
-    public function find(User $user): JsonResponse
+    public function find(User $user): string
     {
-        $userJson = $this->serializer->serialize($user, 'json', ['groups' => 'getUsers']);
-
-        return new JsonResponse($userJson, Response::HTTP_OK, ['accept' => 'json'], true);
+        return $this->serializer->serialize($user, 'json', ['groups' => 'getUsers']);
     }
 
     // Création d'un utilisateur
-    public function create(Request $request): JsonResponse
+    public function create(Request $request): array
     {
         // Récupération des données
         $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
@@ -55,20 +52,17 @@ class UserService implements UserServiceInterface
         $this->em->persist($user);
         $this->em->flush();
 
-        $jsonUser = $this->serializer->serialize($user, 'json', ['groups' => 'getUsers']);
+        $arr["jsonUser"] = $this->serializer->serialize($user, 'json', ['groups' => 'getUsers']);
+        $arr["location"] = $this->urlGenerator->generate('user_details', ['id' => $user->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        $location = $this->urlGenerator->generate('user_details', ['id' => $user->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
-
-        return new JsonResponse($jsonUser, Response::HTTP_CREATED, ["Location" => $location], true);
+        return $arr;
     }
 
 
     // Suppression d'un utilisateur
-    public function delete(User $user): JsonResponse
+    public function delete(User $user)
     {
         $this->em->remove($user);
         $this->em->flush();
-
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 }

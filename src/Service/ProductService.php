@@ -11,27 +11,23 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class ProductService implements ProductServiceInterface
 {
-    public function __construct(private readonly ProductRepository $productRepository, private readonly SerializerInterface $serializer)
-    {
+    public function __construct(
+        private readonly ProductRepository $productRepository,
+        private readonly SerializerInterface $serializer
+    ) {
     }
 
     // Récupération de tous les produits
-    public function findAll(): JsonResponse
+    public function findAll(): string
     {
         $productList = $this->productRepository->findAll();
-        $jsonProductList = $this->serializer->serialize($productList, 'json');
 
-        return new JsonResponse([
-            json_decode($jsonProductList),
-            Response::HTTP_OK,
-        ]);
+        return $this->serializer->serialize($productList, 'json');
     }
 
     // Récupération des détails d'un produit
-    public function find(Product $product): JsonResponse
+    public function find(Product $product): string
     {
-        $jsonBook = $this->serializer->serialize($product, 'json');
-
-        return new JsonResponse($jsonBook, Response::HTTP_OK, ['accept' => 'json'], true);
+        return $this->serializer->serialize($product, 'json');
     }
 }
