@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class UserService implements UserServiceInterface
 {
@@ -20,7 +21,8 @@ class UserService implements UserServiceInterface
         private readonly SerializerInterface $serializer,
         private readonly ClientRepository $clientRepository,
         private readonly EntityManagerInterface $em,
-        private readonly UrlGeneratorInterface $urlGenerator
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly ValidatorInterface $validator
     ) {
     }
 
@@ -43,6 +45,14 @@ class UserService implements UserServiceInterface
     {
         // Récupération des données
         $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
+
+        // Vérification du format de données et gestion des erreurs
+        $errors = $this->validator->validate($user);
+        if (count($errors) > 0) {
+            $arr["jsonErrors"] = $this->serializer->serialize($errors, 'json');
+
+            return $arr;
+        }
 
         // Récupération de l'id client
         $content = $request->toArray();

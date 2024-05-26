@@ -41,7 +41,12 @@ class UserController extends AbstractController
     {
         $arr = $this->userService->create($request);
 
-        return new JsonResponse($arr["jsonUser"], Response::HTTP_CREATED, ["Location" => $arr["location"]], true);
+        // Si la requête est un succès alors 
+        if (array_key_exists("jsonUser", $arr)) {
+            return new JsonResponse($arr["jsonUser"], Response::HTTP_CREATED, ["Location" => $arr["location"]], true);
+        } else {
+            return new JsonResponse($arr["jsonErrors"], Response::HTTP_BAD_REQUEST, [], true);
+        }
     }
 
     // Suppression d'un utilisateur
