@@ -6,10 +6,15 @@ use App\Entity\Client;
 use App\Entity\Product;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\String\ByteString;
 
 class AppFixtures extends Fixture
 {
+    public function __construct(private readonly UserPasswordHasherInterface $userPasswordHasher)
+    {
+    }
+
     public function load(ObjectManager $manager): void
     {
         // Création automatique de 20 produits (portable)
@@ -37,7 +42,8 @@ class AppFixtures extends Fixture
         $client = new Client();
         $client->setName("Client 01");
         $client->setEmail("client01@gmail.com");
-        $client->setPassword('$2y$10$mgou2DC8SJwlaxmYlJJOheSJVyWpj7wwgaCue7xOLR9fP/oCOQFj6'); // Client01?!
+        $client->setRoles(["ROLE_ADMIN"]);
+        $client->setPassword($this->userPasswordHasher->hashPassword($client, 'Client01?!')); // Client01?!
         $manager->persist($client);
 
         $manager->flush();
