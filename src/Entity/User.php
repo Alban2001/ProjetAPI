@@ -35,7 +35,7 @@ class User
     #[Assert\Email(message: "Le format de l'adresse mail {{ value }} n'est pas valide !")]
     private ?string $email = null;
 
-    #[ORM\ManyToOne(inversedBy: 'users')]
+    #[ORM\ManyToOne(targetEntity: Client::class, inversedBy: 'users')]
     #[Groups(["getUsers"])]
     private ?Client $client = null;
 

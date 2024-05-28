@@ -6,6 +6,7 @@ use App\Entity\Client;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Serializer\Mapping\ClassMetadata;
 
 /**
  * @extends ServiceEntityRepository<User>
@@ -24,7 +25,10 @@ class UserRepository extends ServiceEntityRepository
         $firstPage = ($page - 1) * $maxPage;
 
         return $this->createQueryBuilder('u')
-            ->andWhere('u.client_id = :idClient')
+            ->select('u', 'c')
+            ->join('u.client', 'c')
+            ->andWhere('u.client = c.id')
+            ->andWhere('u.client = :idClient')
             ->setParameter('idClient', $client->getId())
             ->orderBy('u.id', 'DESC')
             ->setFirstResult($firstPage)

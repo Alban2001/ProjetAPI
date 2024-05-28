@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class UserService implements UserServiceInterface
 {
@@ -22,22 +24,33 @@ class UserService implements UserServiceInterface
         private readonly ClientRepository $clientRepository,
         private readonly EntityManagerInterface $em,
         private readonly UrlGeneratorInterface $urlGenerator,
-        private readonly ValidatorInterface $validator
+        private readonly ValidatorInterface $validator,
+        private readonly TagAwareCacheInterface $cachePool
     ) {
     }
 
     // Récupération de tout les users par un client
     public function findAll(Client $client, int $page): string
     {
-        $userList = $this->userRepository->findAllWithPagination($client, $page);
+        $idCache = "getUserList-" . $client->getId() . "-" . $page;
+        return $this->cachePool->get($idCache, function (ItemInterface $item) use ($client, $page) {
+            $item->tag("usersCache");
+            $userList = $this->userRepository->findAllWithPagination($client, $page);
+            return $this->serializer->serialize($userList, 'json', ['groups' => 'getUsers']);
+        });
 
-        return $this->serializer->serialize($userList, 'json', ['groups' => 'getUsers']);
     }
 
     // Récupération des détails d'un utilisateur d'un client
     public function find(User $user): string
     {
-        return $this->serializer->serialize($user, 'json', ['groups' => 'getUsers']);
+        $this->cachePool->invalidateTags(["usersCache"]);
+
+        $idCache = "getUserDetails-" . $user->getId();
+        return $this->cachePool->get($idCache, function (ItemInterface $item) use ($user) {
+            $item->tag("userCache");
+            return $this->serializer->serialize($user, 'json', ['groups' => 'getUsers']);
+        });
     }
 
     // Création d'un utilisateur
@@ -72,6 +85,7 @@ class UserService implements UserServiceInterface
     // Suppression d'un utilisateur
     public function delete(User $user)
     {
+        $this->cachePool->invalidateTags(["usersCache"]);
         $this->em->remove($user);
         $this->em->flush();
     }
