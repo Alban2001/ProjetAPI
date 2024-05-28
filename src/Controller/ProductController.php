@@ -7,6 +7,7 @@ use App\Service\ProductServiceInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -19,12 +20,15 @@ class ProductController extends AbstractController
 
     // Affichage de tout les produits
     #[Route('/products', name: 'products_list', methods: ['GET'])]
-    public function getProductList(): JsonResponse
+    public function getProductList(Request $request): JsonResponse
     {
-        return new JsonResponse([
-            json_decode($this->productService->findAll()),
+        // Récupération du numéro de page dans les paramètres + page 1 par défaut
+        $page = $request->get('page', 1);
+
+        return new JsonResponse(
+            [json_decode($this->productService->findAll($page))],
             Response::HTTP_OK,
-        ]);
+        );
     }
 
     // Affichage d'un produit en détail

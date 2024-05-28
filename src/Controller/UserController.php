@@ -23,7 +23,7 @@ class UserController extends AbstractController
     // Affichage de tous les utilisateurs d'un client
     #[Route('/users/client/{id}', name: 'users_list', methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Vous n\'avez pas les droits pour consulter la liste des utilisateurs !')]
-    public function getUserList(#[MapEntity(expr: 'repository.find(id)')] Client $client = null): JsonResponse
+    public function getUserList(#[MapEntity(expr: 'repository.find(id)')] Client $client = null, Request $request): JsonResponse
     {
         // On vérifie que le client existe dans la base de données
         if ($client === null) {
@@ -35,9 +35,10 @@ class UserController extends AbstractController
 
         // On vérifie si le client connecté est bien le client de cet utilisateur
         if ($this->getUser()->getUserIdentifier() == $client->getUserIdentifier()) {
-            return new JsonResponse([
-                json_decode($this->userService->findAll($client))
-            ], Response::HTTP_OK);
+            // Récupération du numéro de page dans les paramètres + page 1 par défaut
+            $page = $request->get('page', 1);
+
+            return new JsonResponse(json_decode($this->userService->findAll($client, $page)), Response::HTTP_OK);
         } else {
             return new JsonResponse([
                 "code" => Response::HTTP_FORBIDDEN,
@@ -71,7 +72,7 @@ class UserController extends AbstractController
     }
 
     // Création d'un nouvel utilisateur
-    #[Route('/users/', name: 'createUser', methods: ['POST'])]
+    #[Route('/users', name: 'createUser', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Vous n\'avez pas les droits pour ajouter un nouvel utilisateur !')]
     public function createUser(Request $request): JsonResponse
     {

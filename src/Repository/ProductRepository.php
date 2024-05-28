@@ -16,6 +16,20 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
+    // Récupération de tous les produits avec un système de pagination
+    public function findAllWithPagination(int $page): array
+    {
+        $maxPage = 10;
+        $firstPage = ($page - 1) * $maxPage;
+
+        return $this->createQueryBuilder('p')
+            ->orderBy('p.id', 'DESC')
+            ->setFirstResult($firstPage)
+            ->setMaxResults($maxPage)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
     //    /**
     //     * @return Product[] Returns an array of Product objects
     //     */
