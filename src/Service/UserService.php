@@ -27,9 +27,9 @@ class UserService implements UserServiceInterface
     }
 
     // Récupération de tout les users par un client
-    public function findAll(Client $client): string
+    public function findAll(Client $client, int $page): string
     {
-        $userList = $this->userRepository->findByClient($client);
+        $userList = $this->userRepository->findAllWithPagination($client, $page);
 
         return $this->serializer->serialize($userList, 'json', ['groups' => 'getUsers']);
     }

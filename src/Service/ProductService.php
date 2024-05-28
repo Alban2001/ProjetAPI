@@ -18,9 +18,9 @@ class ProductService implements ProductServiceInterface
     }
 
     // Récupération de tous les produits
-    public function findAll(): string
+    public function findAll(int $page): string
     {
-        $productList = $this->productRepository->findAll();
+        $productList = $this->productRepository->findAllWithPagination($page);
 
         return $this->serializer->serialize($productList, 'json');
     }

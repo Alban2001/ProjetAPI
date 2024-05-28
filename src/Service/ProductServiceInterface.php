@@ -6,6 +6,6 @@ use App\Entity\Product;
 
 interface ProductServiceInterface
 {
-    public function findAll();
+    public function findAll(int $page);
     public function find(Product $product);
 }
