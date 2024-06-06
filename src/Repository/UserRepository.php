@@ -19,9 +19,9 @@ class UserRepository extends ServiceEntityRepository
     }
 
     // Récupération de tous les utilisateurs avec un système de pagination
-    public function findAllWithPagination(Client $client, int $page): array
+    public function findAllWithPagination(Client $client, int $page, int $limit): array
     {
-        $maxPage = 10;
+        $maxPage = $limit;
         $firstPage = ($page - 1) * $maxPage;
 
         return $this->createQueryBuilder('u')

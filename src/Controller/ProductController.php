@@ -22,11 +22,12 @@ class ProductController extends AbstractController
     #[Route('/products', name: 'products_list', methods: ['GET'])]
     public function getProductList(Request $request): JsonResponse
     {
-        // Récupération du numéro de page dans les paramètres + page 1 par défaut
+        // Récupération du numéro de page et limit dans les paramètres + (page 1 et limit 10 par défaut)
         $page = $request->get('page', 1);
+        $limit = $request->get('limit', 10);
 
         return new JsonResponse(
-            [json_decode($this->productService->findAll($page))],
+            [json_decode($this->productService->findAll($page, $limit))],
             Response::HTTP_OK,
         );
     }

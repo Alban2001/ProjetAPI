@@ -37,8 +37,9 @@ class UserController extends AbstractController
         if ($this->getUser()->getUserIdentifier() == $client->getUserIdentifier()) {
             // Récupération du numéro de page dans les paramètres + page 1 par défaut
             $page = $request->get('page', 1);
+            $limit = $request->get('limit', 10);
 
-            return new JsonResponse(json_decode($this->userService->findAll($client, $page)), Response::HTTP_OK);
+            return new JsonResponse(json_decode($this->userService->findAll($client, $page, $limit)), Response::HTTP_OK);
         } else {
             return new JsonResponse([
                 "code" => Response::HTTP_FORBIDDEN,

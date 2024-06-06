@@ -32,6 +32,9 @@ class Product
     #[ORM\Column(length: 25)]
     private ?string $typeOS = null;
 
+    // Links
+    private ?array $_links = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -105,6 +108,21 @@ class Product
     public function setTypeOS(string $typeOS): static
     {
         $this->typeOS = $typeOS;
+
+        return $this;
+    }
+
+    public function getLinks(): array
+    {
+        return $this->_links;
+    }
+
+    /**
+     * @param list<string> $_links
+     */
+    public function setLinks(array $_links): static
+    {
+        $this->_links = $_links;
 
         return $this;
     }
