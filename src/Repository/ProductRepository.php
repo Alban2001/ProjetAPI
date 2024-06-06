@@ -17,9 +17,9 @@ class ProductRepository extends ServiceEntityRepository
     }
 
     // Récupération de tous les produits avec un système de pagination
-    public function findAllWithPagination(int $page): array
+    public function findAllWithPagination(int $page, int $limit): array
     {
-        $maxPage = 10;
+        $maxPage = $limit;
         $firstPage = ($page - 1) * $maxPage;
 
         return $this->createQueryBuilder('p')

@@ -7,9 +7,7 @@ use App\Entity\User;
 use App\Repository\ClientRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -30,13 +28,21 @@ class UserService implements UserServiceInterface
     }
 
     // Récupération de tout les users par un client
-    public function findAll(Client $client, int $page): string
+    public function findAll(Client $client, int $page, int $limit): string
     {
-        $idCache = "getUserList-" . $client->getId() . "-" . $page;
-        return $this->cachePool->get($idCache, function (ItemInterface $item) use ($client, $page) {
+        $idCache = "getUserList-" . $client->getId() . "-" . $page . "-" . $limit;
+        return $this->cachePool->get($idCache, function (ItemInterface $item) use ($client, $page, $limit) {
             $item->tag("usersCache");
-            $userList = $this->userRepository->findAllWithPagination($client, $page);
-            return $this->serializer->serialize($userList, 'json', ['groups' => 'getUsers']);
+            $userList = $this->userRepository->findAllWithPagination($client, $page, $limit);
+            foreach ($userList as $user) {
+                $user->setLinks([
+                    "self" =>
+                        ["href" => $this->urlGenerator->generate('users_list', ['id' => $user->getId()])],
+                    "delete" =>
+                        ["href" => $this->urlGenerator->generate('deleteUser', ['id' => $user->getId()])]
+                ]);
+            }
+            return $this->serializer->serialize($userList, 'json', ["groups" => "getUsers"]);
         });
 
     }
@@ -49,7 +55,13 @@ class UserService implements UserServiceInterface
         $idCache = "getUserDetails-" . $user->getId();
         return $this->cachePool->get($idCache, function (ItemInterface $item) use ($user) {
             $item->tag("userCache");
-            return $this->serializer->serialize($user, 'json', ['groups' => 'getUsers']);
+            $user->setLinks([
+                "self" =>
+                    ["href" => $this->urlGenerator->generate('users_list', ['id' => $user->getId()])],
+                "delete" =>
+                    ["href" => $this->urlGenerator->generate('deleteUser', ['id' => $user->getId()])]
+            ]);
+            return $this->serializer->serialize($user, 'json', ["groups" => "getUsers"]);
         });
     }
 
@@ -75,7 +87,7 @@ class UserService implements UserServiceInterface
         $this->em->persist($user);
         $this->em->flush();
 
-        $arr["jsonUser"] = $this->serializer->serialize($user, 'json', ['groups' => 'getUsers']);
+        $arr["jsonUser"] = $this->serializer->serialize($user, 'json', ["groups" => "getUsers"]);
         $arr["location"] = $this->urlGenerator->generate('user_details', ['id' => $user->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
         return $arr;

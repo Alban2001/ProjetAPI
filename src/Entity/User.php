@@ -4,8 +4,8 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User
@@ -38,6 +38,10 @@ class User
     #[ORM\ManyToOne(targetEntity: Client::class, inversedBy: 'users')]
     #[Groups(["getUsers"])]
     private ?Client $client = null;
+
+    // Links
+    #[Groups(["getUsers"])]
+    private ?array $_links = null;
 
     public function getId(): ?int
     {
@@ -88,6 +92,21 @@ class User
     public function setClientId(?Client $client): static
     {
         $this->client = $client;
+
+        return $this;
+    }
+
+    public function getLinks(): array
+    {
+        return $this->_links;
+    }
+
+    /**
+     * @param list<string> $_links
+     */
+    public function setLinks(array $_links): static
+    {
+        $this->_links = $_links;
 
         return $this;
     }
