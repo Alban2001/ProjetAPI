@@ -5,6 +5,9 @@ namespace App\Controller;
 use App\Entity\Client;
 use App\Entity\User;
 use App\Service\UserServiceInterface;
+use OpenApi\Annotations\MediaType;
+use OpenApi\Annotations\Property;
+use OpenApi\Annotations\Schema;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -12,6 +15,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Attributes as OA;
 
 #[Route('/api')]
 class UserController extends AbstractController
@@ -20,7 +26,48 @@ class UserController extends AbstractController
     {
     }
 
-    // Affichage de tous les utilisateurs d'un client
+    /*
+     * Méthode permettant de retourner tous les utilisateurs d'un client
+     * 
+     * @param Request $request
+     * @param Client $client
+     * @return JsonResponse
+     */
+    #[OA\Response(
+        response: 200,
+        description: 'Affichage de tous les utilisateurs',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: User::class, groups: ['getUsers']))
+        )
+    )]
+
+    #[OA\Response(
+        response: 403,
+        description: 'Vous n\'avez pas les droits pour consulter la liste des utilisateurs'
+    )]
+
+    #[OA\Response(
+        response: 404,
+        description: 'Client introuvable'
+    )]
+
+    #[OA\Parameter(
+        name: 'page',
+        in: 'query',
+        description: 'Le numéro de page',
+        schema: new OA\Schema(type: 'int')
+    )]
+
+    #[OA\Parameter(
+        name: 'limit',
+        in: 'query',
+        description: 'Le nombre d\'élements par page',
+        schema: new OA\Schema(type: 'int')
+    )]
+
+    #[OA\Tag(name: 'Utilisateurs')]
+
     #[Route('/users/client/{id}', name: 'users_list', methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Vous n\'avez pas les droits pour consulter la liste des utilisateurs !')]
     public function getUserList(#[MapEntity(expr: 'repository.find(id)')] Client $client = null, Request $request): JsonResponse
@@ -48,7 +95,33 @@ class UserController extends AbstractController
         }
     }
 
-    // Affichage des détails d'un utilisateur d'un client
+    /*
+     * Méthode permettant de retourner un utilisateur d'un client
+     * 
+     * @param User $user
+     * @return JsonResponse
+     */
+    #[OA\Response(
+        response: 200,
+        description: 'Affichage d\'un utilisateur',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: User::class, groups: ['getUsers']))
+        )
+    )]
+
+    #[OA\Response(
+        response: 403,
+        description: 'Vous n\'avez pas les droits pour consulter les détails de cet utilisateur'
+    )]
+
+    #[OA\Response(
+        response: 404,
+        description: 'Utilisateur introuvable'
+    )]
+
+    #[OA\Tag(name: 'Utilisateurs')]
+
     #[Route('/users/{id}', name: 'user_details', methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Vous n\'avez pas les droits pour consulter les détails de cet utilisateur !')]
     public function getUserDetails(#[MapEntity(expr: 'repository.find(id)')] User $user = null): JsonResponse
@@ -72,7 +145,41 @@ class UserController extends AbstractController
         }
     }
 
-    // Création d'un nouvel utilisateur
+    /*
+     * Méthode permettant de créer un nouvel utilisateur
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     */
+
+    #[OA\RequestBody(
+        request: "User",
+        description: "Création d'un nouvel utilisateur",
+        required: true,
+        content: new OA\JsonContent(
+            type: User::class,
+            example: [
+                "name" => "name",
+                "first_name" => "first_name",
+                "email" => "example@mail.fr",
+                "idClient" => 0
+            ]
+        )
+    )]
+
+    #[OA\Response(
+        response: 201,
+        description: 'Création d\'un utilisateur créé avec succès',
+        content: new OA\JsonContent(ref: new Model(type: User::class, groups: ['getUsers']))
+    )]
+
+    #[OA\Response(
+        response: 403,
+        description: 'Vous n\'avez pas les droits pour ajouter un nouvel utilisateur'
+    )]
+
+    #[OA\Tag(name: 'Utilisateurs')]
+
     #[Route('/users', name: 'createUser', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Vous n\'avez pas les droits pour ajouter un nouvel utilisateur !')]
     public function createUser(Request $request): JsonResponse
@@ -87,7 +194,29 @@ class UserController extends AbstractController
         }
     }
 
-    // Suppression d'un utilisateur
+    /*
+     * Méthode permettant de supprimer un utilisateur
+     * 
+     * @param User $user
+     * @return JsonResponse
+     */
+    #[OA\Response(
+        response: 204,
+        description: 'Suppression d\'un utilisateur créé avec succès'
+    )]
+
+    #[OA\Response(
+        response: 403,
+        description: 'Vous n\'avez pas les droits pour supprimer cet utilisateur'
+    )]
+
+    #[OA\Response(
+        response: 404,
+        description: 'Utilisateur introuvable'
+    )]
+
+    #[OA\Tag(name: 'Utilisateurs')]
+
     #[Route('/users/{id}', name: 'deleteUser', methods: ['DELETE'])]
     #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Vous n\'avez pas les droits pour supprimer cet utilisateur !')]
     public function deleteUser(User $user = null): JsonResponse
