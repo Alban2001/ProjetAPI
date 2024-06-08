@@ -68,10 +68,10 @@ class UserService implements UserServiceInterface
     // Création d'un utilisateur
     public function create(Request $request): array
     {
-        // Récupération des données
+        /* Récupération des données */
         $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
 
-        // Vérification du format de données et gestion des erreurs
+        /* Vérification du format de données et gestion des erreurs */
         $errors = $this->validator->validate($user);
         if (count($errors) > 0) {
             $arr["jsonErrors"] = $this->serializer->serialize($errors, 'json');
@@ -79,7 +79,7 @@ class UserService implements UserServiceInterface
             return $arr;
         }
 
-        // Récupération de l'id client
+        /* Récupération de l'id client */
         $content = $request->toArray();
         $idClient = $content["idClient"] ?? -1;
         $user->setClientId($this->clientRepository->find($idClient));

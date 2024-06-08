@@ -26,13 +26,6 @@ class UserController extends AbstractController
     {
     }
 
-    /*
-     * Méthode permettant de retourner tous les utilisateurs d'un client
-     * 
-     * @param Request $request
-     * @param Client $client
-     * @return JsonResponse
-     */
     #[OA\Response(
         response: 200,
         description: 'Affichage de tous les utilisateurs',
@@ -70,9 +63,16 @@ class UserController extends AbstractController
 
     #[Route('/users/client/{id}', name: 'users_list', methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Vous n\'avez pas les droits pour consulter la liste des utilisateurs !')]
+    /*
+     * Méthode permettant de retourner tous les utilisateurs d'un client
+     * 
+     * @param Request $request
+     * @param Client $client
+     * @return JsonResponse
+     */
     public function getUserList(#[MapEntity(expr: 'repository.find(id)')] Client $client = null, Request $request): JsonResponse
     {
-        // On vérifie que le client existe dans la base de données
+        /* On vérifie que le client existe dans la base de données */
         if ($client === null) {
             return new JsonResponse([
                 "code" => Response::HTTP_NOT_FOUND,
@@ -80,9 +80,9 @@ class UserController extends AbstractController
             ], Response::HTTP_NOT_FOUND);
         }
 
-        // On vérifie si le client connecté est bien le client de cet utilisateur
+        /* On vérifie si le client connecté est bien le client de cet utilisateur */
         if ($this->getUser()->getUserIdentifier() == $client->getUserIdentifier()) {
-            // Récupération du numéro de page dans les paramètres + page 1 par défaut
+            /* Récupération du numéro de page dans les paramètres + page 1 par défaut */
             $page = $request->get('page', 1);
             $limit = $request->get('limit', 10);
 
@@ -95,12 +95,6 @@ class UserController extends AbstractController
         }
     }
 
-    /*
-     * Méthode permettant de retourner un utilisateur d'un client
-     * 
-     * @param User $user
-     * @return JsonResponse
-     */
     #[OA\Response(
         response: 200,
         description: 'Affichage d\'un utilisateur',
@@ -124,9 +118,15 @@ class UserController extends AbstractController
 
     #[Route('/users/{id}', name: 'user_details', methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Vous n\'avez pas les droits pour consulter les détails de cet utilisateur !')]
+    /*
+     * Méthode permettant de retourner un utilisateur d'un client
+     * 
+     * @param User $user
+     * @return JsonResponse
+     */
     public function getUserDetails(#[MapEntity(expr: 'repository.find(id)')] User $user = null): JsonResponse
     {
-        // On vérifie que l'utilisateur existe dans la base de données
+        /* On vérifie que l'utilisateur existe dans la base de données */
         if ($user === null) {
             return new JsonResponse([
                 "code" => Response::HTTP_NOT_FOUND,
@@ -145,12 +145,6 @@ class UserController extends AbstractController
         }
     }
 
-    /*
-     * Méthode permettant de créer un nouvel utilisateur
-     * 
-     * @param Request $request
-     * @return JsonResponse
-     */
 
     #[OA\RequestBody(
         request: "User",
@@ -182,11 +176,17 @@ class UserController extends AbstractController
 
     #[Route('/users', name: 'createUser', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Vous n\'avez pas les droits pour ajouter un nouvel utilisateur !')]
+    /*
+     * Méthode permettant de créer un nouvel utilisateur
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function createUser(Request $request): JsonResponse
     {
         $arr = $this->userService->create($request);
 
-        // Si la requête est un succès alors 
+        /* Si la requête est un succès alors */
         if (array_key_exists("jsonUser", $arr)) {
             return new JsonResponse($arr["jsonUser"], Response::HTTP_CREATED, ["Location" => $arr["location"]], true);
         } else {
@@ -194,12 +194,6 @@ class UserController extends AbstractController
         }
     }
 
-    /*
-     * Méthode permettant de supprimer un utilisateur
-     * 
-     * @param User $user
-     * @return JsonResponse
-     */
     #[OA\Response(
         response: 204,
         description: 'Suppression d\'un utilisateur créé avec succès'
@@ -219,9 +213,15 @@ class UserController extends AbstractController
 
     #[Route('/users/{id}', name: 'deleteUser', methods: ['DELETE'])]
     #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Vous n\'avez pas les droits pour supprimer cet utilisateur !')]
+    /*
+     * Méthode permettant de supprimer un utilisateur
+     * 
+     * @param User $user
+     * @return JsonResponse
+     */
     public function deleteUser(User $user = null): JsonResponse
     {
-        // On vérifie que l'utilisateur existe dans la base de données
+        /* On vérifie que l'utilisateur existe dans la base de données */
         if ($user === null) {
             return new JsonResponse([
                 "code" => Response::HTTP_NOT_FOUND,
@@ -229,7 +229,7 @@ class UserController extends AbstractController
             ], Response::HTTP_NOT_FOUND);
         }
 
-        // On vérifie si le client connecté est bien le client de cet utilisateur
+        /* On vérifie si le client connecté est bien le client de cet utilisateur */
         if ($this->getUser()->getUserIdentifier() == $user->getClientId()->getUserIdentifier()) {
             $this->userService->delete($user);
 
