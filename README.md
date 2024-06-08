@@ -51,4 +51,4 @@ Afin d'ajouter la base de données du projet dans votre SGBDR, veuillez simpleme
 
 ### Documentation API
 
-Afin de pouvoir tester l'API, cliquer sur le lien afin de pouvoir y accéder : https://127.0.0.1:8000/api/doc 
+Afin de pouvoir tester l'API, cliquer sur le lien afin de pouvoir y accéder : <https://127.0.0.1:8000/api/doc>
