@@ -16,7 +16,14 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
-    // Récupération de tous les produits avec un système de pagination
+    /**
+     * Method Récupération de tous les produits avec un système de pagination
+     *
+     * @param int $page 
+     * @param int $limit 
+     *
+     * @return array
+     */
     public function findAllWithPagination(int $page, int $limit): array
     {
         $maxPage = $limit;
@@ -30,28 +37,4 @@ class ProductRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
-    //    /**
-    //     * @return Product[] Returns an array of Product objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('p.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Product
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }

@@ -27,9 +27,18 @@ class UserService implements UserServiceInterface
     ) {
     }
 
-    // Récupération de tout les users par un client
+    /**
+     * Récupération de tout les users par un client
+     * 
+     * @param Client $client
+     * @param int $page
+     * @param int $limit
+     * 
+     * @return string
+     */
     public function findAll(Client $client, int $page, int $limit): string
     {
+        // Mise en place du cache pour garder en mémoire l'affichage de tous les utilisateurs
         $idCache = "getUserList-" . $client->getId() . "-" . $page . "-" . $limit;
         return $this->cachePool->get($idCache, function (ItemInterface $item) use ($client, $page, $limit) {
             $item->tag("usersCache");
@@ -47,9 +56,16 @@ class UserService implements UserServiceInterface
 
     }
 
-    // Récupération des détails d'un utilisateur d'un client
+    /**
+     * Récupération des détails d'un utilisateur d'un client
+     * 
+     * @param User $user
+     * 
+     * @return string
+     */
     public function find(User $user): string
     {
+        // Mise en place du cache pour garder en mémoire l'affichage des détails d'un utilisateur
         $this->cachePool->invalidateTags(["usersCache"]);
 
         $idCache = "getUserDetails-" . $user->getId();
@@ -65,13 +81,19 @@ class UserService implements UserServiceInterface
         });
     }
 
-    // Création d'un utilisateur
+    /**
+     * Création d'un utilisateur
+     * 
+     * @param Request $request
+     * 
+     * @return array
+     */
     public function create(Request $request): array
     {
-        /* Récupération des données */
+        // Récupération des données
         $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
 
-        /* Vérification du format de données et gestion des erreurs */
+        // Vérification du format de données et gestion des erreurs
         $errors = $this->validator->validate($user);
         if (count($errors) > 0) {
             $arr["jsonErrors"] = $this->serializer->serialize($errors, 'json');
@@ -79,7 +101,7 @@ class UserService implements UserServiceInterface
             return $arr;
         }
 
-        /* Récupération de l'id client */
+        // Récupération de l'id client
         $content = $request->toArray();
         $idClient = $content["idClient"] ?? -1;
         $user->setClientId($this->clientRepository->find($idClient));
@@ -93,8 +115,13 @@ class UserService implements UserServiceInterface
         return $arr;
     }
 
-
-    // Suppression d'un utilisateur
+    /**
+     * Suppression d'un utilisateur
+     * 
+     * @param User $user
+     * 
+     * @return void
+     */
     public function delete(User $user)
     {
         $this->cachePool->invalidateTags(["usersCache"]);

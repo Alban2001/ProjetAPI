@@ -43,16 +43,33 @@ class User
     #[Groups(["getUsers"])]
     private ?array $_links = null;
 
+    /**
+     * Method getId
+     *
+     * @return int
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    /**
+     * Method getName
+     *
+     * @return string
+     */
     public function getName(): ?string
     {
         return $this->name;
     }
 
+    /**
+     * Method setName
+     *
+     * @param string $name
+     *
+     * @return static
+     */
     public function setName(string $name): static
     {
         $this->name = $name;
@@ -60,11 +77,23 @@ class User
         return $this;
     }
 
+    /**
+     * Method getFirstName
+     *
+     * @return string
+     */
     public function getFirstName(): ?string
     {
         return $this->first_name;
     }
 
+    /**
+     * Method setFirstName
+     *
+     * @param string $first_name [explicite description]
+     *
+     * @return static
+     */
     public function setFirstName(string $first_name): static
     {
         $this->first_name = $first_name;
@@ -72,11 +101,23 @@ class User
         return $this;
     }
 
+    /**
+     * Method getEmail
+     *
+     * @return string
+     */
     public function getEmail(): ?string
     {
         return $this->email;
     }
 
+    /**
+     * Method setEmail
+     *
+     * @param string $email [explicite description]
+     *
+     * @return static
+     */
     public function setEmail(string $email): static
     {
         $this->email = $email;
@@ -84,11 +125,23 @@ class User
         return $this;
     }
 
+    /**
+     * Method getClientId
+     *
+     * @return Client
+     */
     public function getClientId(): ?Client
     {
         return $this->client;
     }
 
+    /**
+     * Method setClientId
+     *
+     * @param ?Client $client [explicite description]
+     *
+     * @return static
+     */
     public function setClientId(?Client $client): static
     {
         $this->client = $client;
@@ -96,6 +149,11 @@ class User
         return $this;
     }
 
+    /**
+     * Method getLinks
+     *
+     * @return array
+     */
     public function getLinks(): array
     {
         return $this->_links;

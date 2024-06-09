@@ -19,7 +19,14 @@ class ProductService implements ProductServiceInterface
     ) {
     }
 
-    // Récupération de tous les produits
+    /**
+     * Récupération de tous les produits
+     * 
+     * @param int $page
+     * @param int $limit
+     * 
+     * @return string
+     */
     public function findAll(int $page, int $limit): string
     {
         $idCache = "getProductList-" . $page . "-" . $limit;
@@ -36,7 +43,13 @@ class ProductService implements ProductServiceInterface
         });
     }
 
-    // Récupération des détails d'un produit
+    /**
+     * Récupération des détails d'un produit
+     * 
+     * @param Product $product
+     * 
+     * @return string
+     */
     public function find(Product $product): string
     {
         $this->cachePool->invalidateTags(["productsCache"]);
