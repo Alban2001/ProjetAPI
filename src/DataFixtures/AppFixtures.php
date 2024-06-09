@@ -17,7 +17,7 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        // Création automatique de 20 produits (portable)
+        /* Création automatique de 20 produits (portable) */
         $typeOS = ["IOS", "Android"];
         $memoryRam = [4, 6, 8, 10, 12, 14, 16, 18, 20];
         $memoryStore = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
@@ -38,7 +38,7 @@ class AppFixtures extends Fixture
             $manager->persist($product);
         }
 
-        // Création d'un client
+        /* Création d'un client */
         $client = new Client();
         $client->setName("Client 01");
         $client->setEmail("client01@gmail.com");
@@ -46,7 +46,7 @@ class AppFixtures extends Fixture
         $client->setPassword($this->userPasswordHasher->hashPassword($client, 'Client01?!')); // Client01?!
         $manager->persist($client);
 
-        // Création d'un client 2
+        /* Création d'un client 2 */
         $client2 = new Client();
         $client2->setName("Client 02");
         $client2->setEmail("client02@gmail.com");

@@ -21,12 +21,6 @@ class ProductController extends AbstractController
     {
     }
 
-    /*
-     * Méthode permettant de retourner tous les produits
-     * 
-     * @param Request $request
-     * @return JsonResponse
-     */
     #[OA\Response(
         response: 200,
         description: 'Affichage de tous les produits',
@@ -53,9 +47,16 @@ class ProductController extends AbstractController
     #[OA\Tag(name: 'Produits')]
 
     #[Route('/products', name: 'products_list', methods: ['GET'])]
+
+    /*
+     * Méthode permettant de retourner tous les produits
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function getProductList(Request $request): JsonResponse
     {
-        // Récupération du numéro de page et limit dans les paramètres + (page 1 et limit 10 par défaut)
+        /* Récupération du numéro de page et limit dans les paramètres + (page 1 et limit 10 par défaut) */
         $page = $request->get('page', 1);
         $limit = $request->get('limit', 10);
 
@@ -65,12 +66,6 @@ class ProductController extends AbstractController
         );
     }
 
-    /*
-     * Méthode permettant de retourner le détail d'un produit
-     * 
-     * @param Product $product
-     * @return JsonResponse
-     */
     #[OA\Response(
         response: 200,
         description: 'Affichage du détail d\'un produit',
@@ -88,9 +83,16 @@ class ProductController extends AbstractController
     #[OA\Tag(name: 'Produits')]
 
     #[Route('/products/{id}', name: 'product_details', methods: ['GET'])]
+
+    /*
+     * Méthode permettant de retourner le détail d'un produit
+     * 
+     * @param Product $product
+     * @return JsonResponse
+     */
     public function getProductDetails(#[MapEntity(expr: 'repository.find(id)')] Product $product = null): JsonResponse
     {
-        // On vérifie que le produit existe dans la base de données
+        /* On vérifie que le produit existe dans la base de données */
         if ($product === null) {
             return new JsonResponse([
                 "code" => Response::HTTP_NOT_FOUND,
