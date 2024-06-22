@@ -13,6 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Attributes as OA;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api')]
 class ProductController extends AbstractController
@@ -28,6 +29,11 @@ class ProductController extends AbstractController
             type: 'array',
             items: new OA\Items(ref: new Model(type: Product::class))
         )
+    )]
+
+    #[OA\Response(
+        response: 403,
+        description: 'Vous n\'avez pas les droits pour consulter la liste des produits'
     )]
 
     #[OA\Parameter(
@@ -55,6 +61,8 @@ class ProductController extends AbstractController
      * 
      * @return JsonResponse
      */
+
+    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Vous n\'avez pas les droits pour consulter la liste des produits !')]
     public function getProductList(Request $request): JsonResponse
     {
         // Récupération du numéro de page et limit dans les paramètres + (page 1 et limit 10 par défaut)
@@ -77,6 +85,11 @@ class ProductController extends AbstractController
     )]
 
     #[OA\Response(
+        response: 403,
+        description: 'Vous n\'avez pas les droits pour consulter les détails de ce produit'
+    )]
+
+    #[OA\Response(
         response: 404,
         description: 'Produit introuvable'
     )]
@@ -92,6 +105,7 @@ class ProductController extends AbstractController
      * 
      * @return JsonResponse
      */
+    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Vous n\'avez pas les droits pour consulter les détails de ce produit !')]
     public function getProductDetails(#[MapEntity(expr: 'repository.find(id)')] Product $product = null): JsonResponse
     {
         // On vérifie que le produit existe dans la base de données

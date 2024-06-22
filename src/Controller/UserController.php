@@ -61,39 +61,22 @@ class UserController extends AbstractController
 
     #[OA\Tag(name: 'Utilisateurs')]
 
-    #[Route('/users/client/{id}', name: 'users_list', methods: ['GET'])]
+    #[Route('/users', name: 'users_list', methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Vous n\'avez pas les droits pour consulter la liste des utilisateurs !')]
     /**
      * Méthode permettant de retourner tous les utilisateurs d'un client
      * 
      * @param Request $request
-     * @param Client $client
      * 
      * @return JsonResponse
      */
-    public function getUserList(#[MapEntity(expr: 'repository.find(id)')] Client $client = null, Request $request): JsonResponse
+    public function getUserList(Request $request): JsonResponse
     {
-        // On vérifie que le client existe dans la base de données
-        if ($client === null) {
-            return new JsonResponse([
-                "code" => Response::HTTP_NOT_FOUND,
-                "message" => "Ce compte n'existe pas !"
-            ], Response::HTTP_NOT_FOUND);
-        }
+        // Récupération du numéro de page dans les paramètres + page 1 par défaut
+        $page = $request->get('page', 1);
+        $limit = $request->get('limit', 10);
 
-        // On vérifie si le client connecté est bien le client de cet utilisateur
-        if ($this->getUser()->getUserIdentifier() === $client->getUserIdentifier()) {
-            // Récupération du numéro de page dans les paramètres + page 1 par défaut
-            $page = $request->get('page', 1);
-            $limit = $request->get('limit', 10);
-
-            return new JsonResponse(json_decode($this->userService->findAll($client, $page, $limit)), Response::HTTP_OK);
-        } else {
-            return new JsonResponse([
-                "code" => Response::HTTP_FORBIDDEN,
-                "message" => "Vous n'avez pas les droits pour consulter la liste de ces utilisateurs !"
-            ], Response::HTTP_FORBIDDEN);
-        }
+        return new JsonResponse(json_decode($this->userService->findAll($this->getUser(), $page, $limit)), Response::HTTP_OK);
     }
 
     #[OA\Response(
